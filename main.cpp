@@ -36,7 +36,7 @@ Result bellmanFord(int n, const vector<Edge>& edges, int source) {
 
     // TODO:
     // Step 1. 初始化 source 的距離為 0
-    // res.dist[source] = 0;
+    res.dist[source] = 0;
 
     // TODO:
     // Step 2. 進行 n-1 輪鬆弛 (relaxation)
@@ -49,11 +49,25 @@ Result bellmanFord(int n, const vector<Edge>& edges, int source) {
     //
     // 注意：
     // 只有當 dist[u] 不是 INF 時才能鬆弛
+    for (int i = 0; i < n - 1; i++) {
+        for (const auto& edge : edges) {
+            if (res.dist[edge.u] != INF && res.dist[edge.u] + edge.w < res.dist[edge.v]) {
+                res.dist[edge.v] = res.dist[edge.u] + edge.w;
+                res.parent[edge.v] = edge.u;
+            }
+        }
+    }
 
     // TODO:
     // Step 3. 再檢查一次所有邊
     // 若還能再鬆弛，表示存在負環
     // res.hasNegativeCycle = true;
+    for (const auto& edge : edges) {
+        if (res.dist[edge.u] != INF && res.dist[edge.u] + edge.w < res.dist[edge.v]) {
+            res.hasNegativeCycle = true;
+            break;
+        }
+    }
 
     return res;
 }
@@ -67,6 +81,14 @@ void printPath(const vector<int>& parent, int target) {
     // 若 target == -1，直接 return
     // 否則先遞迴印 parent[target]
     // 再印出 target
+    if (target == -1) {
+        return;
+    }
+    if (parent[target] != -1) {
+        printPath(parent, parent[target]);
+        cout << " -> ";
+    }
+    cout << target;
 }
 
 // ==============================
@@ -113,6 +135,7 @@ int main() {
             cout << "Path: ";
             // TODO:
             // 呼叫 printPath(ans.parent, target);
+            printPath(ans.parent, target);
             cout << "\n";
         }
 
